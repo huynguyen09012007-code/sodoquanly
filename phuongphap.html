@@ -1,0 +1,353 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>5 Phương Pháp Quản Lý (Academic V23)</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <style>
+        :root { --primary-color: #2c3e50; }
+        body { 
+            font-family: 'Segoe UI', Roboto, sans-serif; margin: 0; 
+            height: 100vh; width: 100vw; overflow: hidden;
+            background: #0f172a; display: flex; justify-content: center; align-items: center;
+        }
+        
+        /* BACKGROUND TỔNG THỂ: SÁNG & HỌC THUẬT */
+        .bg-layer { 
+            position: fixed; width: 100%; height: 100%; top:0; left:0; 
+            background: url('https://images.unsplash.com/photo-1497366216548-37526070297c?q=80&w=2069') center/cover; 
+            filter: blur(3px) brightness(0.6); 
+            z-index: -2; 
+        }
+        
+        /* THẺ TÊN */
+        .student-card { 
+            position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%);
+            background: rgba(255,255,255,0.95); padding: 10px 25px; 
+            border-radius: 50px; border-bottom: 4px solid #2980b9;
+            z-index: 1000; box-shadow: 0 10px 30px rgba(0,0,0,0.5); 
+            display: flex; gap: 15px; align-items: center;
+        }
+        .student-card h4 { margin: 0; font-size: 1rem; color: #333; text-transform: uppercase; font-weight: 800; }
+        .student-card p { margin: 0; font-size: 0.85rem; color: #666; border-left: 2px solid #ccc; padding-left: 15px;}
+
+        /* CENTER NODE */
+        .center-node { 
+            position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); 
+            width: 190px; height: 190px;
+            background: linear-gradient(135deg, #1a2a6c, #b21f1f, #fdbb2d); /* Màu Gradient quyền lực */
+            border-radius: 50%; 
+            display: flex; flex-direction: column; justify-content: center; align-items: center; 
+            color: white; z-index: 10; border: 5px solid rgba(255,255,255,0.8); 
+            box-shadow: 0 0 50px rgba(253, 187, 45, 0.4); text-align: center; 
+        }
+        .center-node i { font-size: 3rem; margin-bottom: 8px; color: #fff; }
+        .center-node h1 { font-size: 1.1rem; margin: 0; text-transform: uppercase; font-weight: 800; text-shadow: 1px 1px 3px rgba(0,0,0,0.5);}
+
+        /* CONTAINER */
+        .mindmap-container { position: relative; width: 100%; height: 100%; max-width: 1600px; max-height: 900px; }
+        
+        /* NODE STYLE */
+        .node { 
+            position: absolute; width: 380px; /* Rộng hơn chút để chứa nội dung dài */
+            background: #fff; 
+            border-radius: 12px; box-shadow: 0 10px 30px rgba(0,0,0,0.5); 
+            z-index: 5; display: flex; flex-direction: column; overflow: hidden; 
+            border-top: 5px solid #ccc; transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+        }
+        
+        /* LỚP ẢNH NỀN NODE - HIỆN RÕ */
+        .node-bg-inner {
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            background-size: cover; background-position: center;
+            opacity: 0.5; /* Ảnh hiện rõ 50% */
+            z-index: 1; filter: none; transition: all 0.5s ease;
+        }
+        .node:hover .node-bg-inner { opacity: 0.7; transform: scale(1.05); }
+
+        /* NỘI DUNG NODE */
+        .node-content-wrapper { position: relative; z-index: 2; } 
+        
+        .node-header { 
+            padding: 15px 15px; display: flex; align-items: center; gap: 12px; 
+            border-bottom: 1px solid rgba(0,0,0,0.1); 
+            background: transparent; cursor: pointer;
+        }
+        
+        .icon-box { 
+            width: 45px; height: 45px; border-radius: 10px; display: flex; 
+            justify-content: center; align-items: center; font-size: 1.4rem; color: white; 
+            flex-shrink: 0; box-shadow: 0 4px 8px rgba(0,0,0,0.3);
+        }
+        .header-text h3 { 
+            margin: 0; font-size: 0.9rem; text-transform: uppercase; font-weight: 900; 
+            color: #222; line-height: 1.3;
+            text-shadow: 0 0 10px rgba(255,255,255,1), 0 0 20px rgba(255,255,255,0.8);
+        }
+        
+        .node-body { 
+            max-height: 0; opacity: 0; overflow: hidden; padding: 0 15px; 
+            transition: all 0.3s ease; 
+            background: rgba(255,255,255,0.6); /* Nền trắng mỏng để đọc chữ */
+        }
+        
+        .node:hover { transform: translateY(-10px); z-index: 50; }
+        .node:hover .node-body { 
+            max-height: 600px; opacity: 1; 
+            padding-bottom: 20px; padding-top: 10px; overflow-y: auto; 
+        }
+
+        /* LIST ITEMS */
+        .sec-title { 
+            display: block; font-weight: bold; font-size: 0.75rem; margin: 12px 0 6px 0; 
+            padding: 4px 8px; border-radius: 4px; color: #fff; width: fit-content; 
+            text-transform: uppercase; letter-spacing: 0.5px; 
+            box-shadow: 0 2px 5px rgba(0,0,0,0.3); text-shadow: none;
+        }
+        /* Màu sắc tiêu đề con */
+        .t-dacdiem { background: #34495e; } 
+        .t-uu { background: #27ae60; }     
+        .t-nhuoc { background: #c0392b; }  
+        .t-ungdung { background: #8e44ad; } 
+        
+        .list-item { 
+            display: flex; align-items: flex-start; margin-bottom: 5px; 
+            font-size: 0.85rem; color: #000; font-weight: 700; /* Chữ đậm */
+            line-height: 1.5; border-bottom: 1px dashed rgba(0,0,0,0.3); padding-bottom: 5px;
+            text-shadow: 0 0 5px rgba(255,255,255,0.9); 
+        }
+        .list-item i { margin-right: 10px; margin-top: 4px; font-size: 0.8rem; flex-shrink: 0;}
+
+        /* --- VỊ TRÍ, MÀU SẮC & ẢNH NỀN TỪNG PHƯƠNG PHÁP --- */
+        
+        /* 1. GIÁO DỤC CHÍNH TRỊ - TƯ TƯỞNG (Góc 1h) - Màu Đỏ */
+        .pos-1 { top: 8%; right: 8%; border-color: #c0392b; }
+        .g1 { background: linear-gradient(135deg, #c0392b, #e74c3c); }
+        /* Ảnh: Cờ đỏ hoặc Hội trường trang nghiêm */
+        .img-1 { background-image: url('https://images.unsplash.com/photo-1577495508048-b635879837f1?q=80&w=800&auto=format&fit=crop'); }
+
+        /* 2. TÂM LÝ - XÃ HỘI (Góc 3h) - Màu Xanh Dương Nhạt */
+        .pos-2 { top: 50%; right: 2%; transform: translateY(-50%); border-color: #2980b9; }
+        .pos-2:hover { transform: translateY(-55%); }
+        .g2 { background: linear-gradient(135deg, #2980b9, #3498db); }
+        /* Ảnh: Bắt tay, Kết nối con người */
+        .img-2 { background-image: url('https://images.unsplash.com/photo-1521791136064-7986c2920216?q=80&w=800&auto=format&fit=crop'); }
+
+        /* 3. KINH TẾ (Góc 5h) - Màu Vàng/Cam */
+        .pos-3 { bottom: 8%; right: 8%; border-color: #f39c12; }
+        .g3 { background: linear-gradient(135deg, #f39c12, #f1c40f); }
+        /* Ảnh: Tiền tệ, Biểu đồ tài chính */
+        .img-3 { background-image: url('https://images.unsplash.com/photo-1611974765270-ca1258634369?q=80&w=800&auto=format&fit=crop'); }
+
+        /* 4. TỔ CHỨC - ĐIỀU KHIỂN (Góc 7h) - Màu Xanh Lá (hoặc Chàm) -> Chọn màu Chàm cho khác biệt */
+        .pos-4 { bottom: 8%; left: 8%; border-color: #4a69bd; }
+        .g4 { background: linear-gradient(135deg, #4a69bd, #6a89cc); }
+        /* Ảnh: Bánh răng, Cơ cấu tổ chức */
+        .img-4 { background-image: url('https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?q=80&w=800&auto=format&fit=crop'); }
+
+        /* 5. HÀNH CHÍNH - LUẬT PHÁP (Góc 10h) - Màu Tím (Quyền lực) */
+        .pos-5 { top: 8%; left: 8%; border-color: #8e44ad; }
+        .g5 { background: linear-gradient(135deg, #8e44ad, #9b59b6); }
+        /* Ảnh: Cái búa thẩm phán, Văn bản luật */
+        .img-5 { background-image: url('https://images.unsplash.com/photo-1589829085413-56de8ae18c73?q=80&w=800&auto=format&fit=crop'); }
+
+        svg#connections { position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 0; pointer-events: none; }
+        
+        @media (max-width: 1100px) {
+            body { overflow: auto; height: auto; display: block; padding: 40px 15px; }
+            .student-card { position: relative; bottom: auto; left: auto; transform: none; margin: 0 auto 30px auto; width: fit-content; border-bottom: none; border-left: 4px solid #2980b9;}
+            .mindmap-container { height: auto; display: flex; flex-direction: column; align-items: center; gap: 15px;}
+            svg#connections { display: none; }
+            .center-node { position: relative; top: auto; left: auto; transform: none; margin-bottom: 25px; }
+            .node { position: relative; top: auto !important; left: auto !important; width: 100%; transform: none !important; margin-bottom: 10px;}
+            .node .node-body { max-height: none; opacity: 1; padding: 15px; }
+            .node:hover { transform: none; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="bg-layer"></div>
+
+<div class="mindmap-container">
+    <svg id="connections"></svg>
+
+    <div class="center-node" id="center">
+        <i class="fa-solid fa-sitemap"></i>
+        <h1>5 PHƯƠNG PHÁP<br>QUẢN LÝ</h1>
+    </div>
+
+    <div class="node pos-1" id="n1">
+        <div class="node-bg-inner img-1"></div>
+        <div class="node-content-wrapper">
+            <div class="node-header">
+                <div class="icon-box g1"><i class="fa-solid fa-star"></i></div>
+                <div class="header-text"><h3>PP Giáo Dục<br>Chính Trị - Tư Tưởng</h3></div>
+            </div>
+            <div class="node-body">
+                <span class="sec-title t-dacdiem">Đặc điểm</span>
+                <div class="list-item"><i class="fa-solid fa-circle"></i> Tác động vào nhận thức, thế giới quan, nhân sinh quan.</div>
+                <div class="list-item"><i class="fa-solid fa-circle"></i> Trang bị lý luận Mác-Lênin, tư tưởng Hồ Chí Minh.</div>
+                
+                <span class="sec-title t-uu">Ưu điểm</span>
+                <div class="list-item"><i class="fa-solid fa-check"></i> Tạo sự thống nhất cao về ý chí và hành động.</div>
+                <div class="list-item"><i class="fa-solid fa-check"></i> Xây dựng lòng trung thành bền vững từ bên trong.</div>
+                
+                <span class="sec-title t-nhuoc">Nhược điểm (Hạn chế)</span>
+                <div class="list-item"><i class="fa-solid fa-xmark"></i> Tác dụng chậm, cần quá trình "mưa dầm thấm lâu".</div>
+                <div class="list-item"><i class="fa-solid fa-xmark"></i> Dễ trở thành hình thức sáo rỗng nếu xa rời thực tế.</div>
+
+                <span class="sec-title t-ungdung">Ứng dụng thực tiễn</span>
+                <div class="list-item"><i class="fa-solid fa-rocket"></i> Các lớp bồi dưỡng lý luận chính trị.</div>
+                <div class="list-item"><i class="fa-solid fa-rocket"></i> Cuộc vận động "Học tập và làm theo Bác".</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="node pos-2" id="n2">
+        <div class="node-bg-inner img-2"></div>
+        <div class="node-content-wrapper">
+            <div class="node-header">
+                <div class="icon-box g2"><i class="fa-solid fa-hand-holding-heart"></i></div>
+                <div class="header-text"><h3>PP Tâm Lý - Xã Hội</h3></div>
+            </div>
+            <div class="node-body">
+                <span class="sec-title t-dacdiem">Đặc điểm</span>
+                <div class="list-item"><i class="fa-solid fa-circle"></i> Tác động vào tình cảm, tâm tư, dư luận xã hội.</div>
+                <div class="list-item"><i class="fa-solid fa-circle"></i> Biện pháp: Thuyết phục, động viên, khích lệ.</div>
+                
+                <span class="sec-title t-uu">Ưu điểm</span>
+                <div class="list-item"><i class="fa-solid fa-check"></i> Tạo không khí làm việc tích cực, giảm xung đột.</div>
+                <div class="list-item"><i class="fa-solid fa-check"></i> Khơi dậy tính tự giác và sáng tạo của cá nhân.</div>
+
+                <span class="sec-title t-nhuoc">Nhược điểm (Hạn chế)</span>
+                <div class="list-item"><i class="fa-solid fa-xmark"></i> Khó định lượng hiệu quả cụ thể.</div>
+                <div class="list-item"><i class="fa-solid fa-xmark"></i> Phụ thuộc nhiều vào nghệ thuật của người lãnh đạo.</div>
+
+                <span class="sec-title t-ungdung">Ứng dụng thực tiễn</span>
+                <div class="list-item"><i class="fa-solid fa-rocket"></i> Hoạt động Team building, thăm hỏi hiếu hỉ.</div>
+                <div class="list-item"><i class="fa-solid fa-rocket"></i> Khen thưởng, vinh danh trước tập thể.</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="node pos-3" id="n3">
+        <div class="node-bg-inner img-3"></div>
+        <div class="node-content-wrapper">
+            <div class="node-header">
+                <div class="icon-box g3"><i class="fa-solid fa-sack-dollar"></i></div>
+                <div class="header-text"><h3>PP Kinh Tế</h3></div>
+            </div>
+            <div class="node-body">
+                <span class="sec-title t-dacdiem">Đặc điểm</span>
+                <div class="list-item"><i class="fa-solid fa-circle"></i> Sử dụng các đòn bẩy kinh tế (lương, thưởng, phạt).</div>
+                <div class="list-item"><i class="fa-solid fa-circle"></i> Gắn lợi ích vật chất với kết quả lao động.</div>
+                
+                <span class="sec-title t-uu">Ưu điểm</span>
+                <div class="list-item"><i class="fa-solid fa-check"></i> Động lực mạnh mẽ nhất để tăng năng suất.</div>
+                <div class="list-item"><i class="fa-solid fa-check"></i> Đảm bảo công bằng: Làm nhiều hưởng nhiều.</div>
+
+                <span class="sec-title t-nhuoc">Nhược điểm (Hạn chế)</span>
+                <div class="list-item"><i class="fa-solid fa-xmark"></i> Dễ sinh tâm lý thực dụng, "tiền trao cháo múc".</div>
+                <div class="list-item"><i class="fa-solid fa-xmark"></i> Nguy cơ cạnh tranh thiếu lành mạnh, giấu nghề.</div>
+
+                <span class="sec-title t-ungdung">Ứng dụng thực tiễn</span>
+                <div class="list-item"><i class="fa-solid fa-rocket"></i> Trả lương theo vị trí (3P), thưởng KPI.</div>
+                <div class="list-item"><i class="fa-solid fa-rocket"></i> Phạt vi phạm hợp đồng, khoán chi.</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="node pos-4" id="n4">
+        <div class="node-bg-inner img-4"></div>
+        <div class="node-content-wrapper">
+            <div class="node-header">
+                <div class="icon-box g4"><i class="fa-solid fa-gears"></i></div>
+                <div class="header-text"><h3>PP Tổ Chức - Điều Khiển</h3></div>
+            </div>
+            <div class="node-body">
+                <span class="sec-title t-dacdiem">Đặc điểm</span>
+                <div class="list-item"><i class="fa-solid fa-circle"></i> Thiết lập bộ máy, phân công nhiệm vụ, quy trình.</div>
+                <div class="list-item"><i class="fa-solid fa-circle"></i> Tạo ra "khung xương" để hệ thống vận hành.</div>
+                
+                <span class="sec-title t-uu">Ưu điểm</span>
+                <div class="list-item"><i class="fa-solid fa-check"></i> Đảm bảo tính khoa học, chuyên môn hóa cao.</div>
+                <div class="list-item"><i class="fa-solid fa-check"></i> Tránh chồng chéo, "rõ người rõ việc".</div>
+
+                <span class="sec-title t-nhuoc">Nhược điểm (Hạn chế)</span>
+                <div class="list-item"><i class="fa-solid fa-xmark"></i> Bộ máy cồng kềnh gây lãng phí nguồn lực.</div>
+                <div class="list-item"><i class="fa-solid fa-xmark"></i> Quy trình rườm rà gây ách tắc (thủ tục hành chính).</div>
+
+                <span class="sec-title t-ungdung">Ứng dụng thực tiễn</span>
+                <div class="list-item"><i class="fa-solid fa-rocket"></i> Xây dựng Sơ đồ tổ chức, Bảng mô tả công việc (JD).</div>
+                <div class="list-item"><i class="fa-solid fa-rocket"></i> Quy trình ISO, quy trình một cửa.</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="node pos-5" id="n5">
+        <div class="node-bg-inner img-5"></div>
+        <div class="node-content-wrapper">
+            <div class="node-header">
+                <div class="icon-box g5"><i class="fa-solid fa-gavel"></i></div>
+                <div class="header-text"><h3>PP Hành Chính<br>Luật Pháp</h3></div>
+            </div>
+            <div class="node-body">
+                <span class="sec-title t-dacdiem">Đặc điểm</span>
+                <div class="list-item"><i class="fa-solid fa-circle"></i> Dựa trên quyền lực nhà nước, tính cưỡng chế.</div>
+                <div class="list-item"><i class="fa-solid fa-circle"></i> Sử dụng văn bản quy phạm pháp luật, quyết định.</div>
+                
+                <span class="sec-title t-uu">Ưu điểm</span>
+                <div class="list-item"><i class="fa-solid fa-check"></i> Thiết lập trật tự, kỷ cương nhanh chóng.</div>
+                <div class="list-item"><i class="fa-solid fa-check"></i> Giải quyết kịp thời các tình huống khẩn cấp.</div>
+
+                <span class="sec-title t-nhuoc">Nhược điểm (Hạn chế)</span>
+                <div class="list-item"><i class="fa-solid fa-xmark"></i> Cứng nhắc, thiếu linh hoạt, dễ gây quan liêu.</div>
+                <div class="list-item"><i class="fa-solid fa-xmark"></i> Dễ sinh tâm lý "đối phó" ở cấp dưới.</div>
+
+                <span class="sec-title t-ungdung">Ứng dụng thực tiễn</span>
+                <div class="list-item"><i class="fa-solid fa-rocket"></i> Ban hành Luật, Nghị định, Thông tư.</div>
+                <div class="list-item"><i class="fa-solid fa-rocket"></i> Ra Quyết định bổ nhiệm, kỷ luật.</div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="student-card">
+    <h4>NHÓM 1/N01-KHQL</h4>
+    <p>QTTT - ĐH Văn hóa Hà Nội</p>
+</div>
+
+<script>
+    function drawLines() {
+        if(window.innerWidth <= 1100) return;
+        const svg = document.getElementById('connections'); svg.innerHTML = '';
+        const center = document.getElementById('center'); const cRect = center.getBoundingClientRect();
+        const cX = cRect.left + cRect.width/2; const cY = cRect.top + cRect.height/2;
+
+        document.querySelectorAll('.node').forEach(node => {
+            const nRect = node.getBoundingClientRect();
+            let nX, nY;
+            if (nRect.left > cRect.right) { nX = nRect.left + 20; nY = nRect.top + 25; } 
+            else if (nRect.right < cRect.left) { nX = nRect.right - 20; nY = nRect.top + 25; } 
+            else { nX = nRect.left + nRect.width/2; nY = (nRect.top > cY) ? nRect.top : nRect.bottom; }
+
+            const style = window.getComputedStyle(node);
+            const color = style.borderColor;
+
+            const line = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+            const d = `M ${cX} ${cY} Q ${cX} ${nY} ${nX} ${nY}`;
+            line.setAttribute('d', d); line.setAttribute('stroke', color); line.setAttribute('stroke-width', '2');
+            line.setAttribute('fill', 'none'); line.setAttribute('stroke-dasharray', '5,5');
+            svg.appendChild(line);
+        });
+    }
+    window.addEventListener('load', drawLines); window.addEventListener('resize', drawLines);
+    document.querySelectorAll('.node').forEach(node => {
+        node.addEventListener('mouseenter', () => setTimeout(drawLines, 50));
+        node.addEventListener('mouseleave', () => setTimeout(drawLines, 350));
+    });
+</script>
+</body>
+</html>
