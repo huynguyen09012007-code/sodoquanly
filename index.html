@@ -3,176 +3,152 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sơ Đồ Tư Duy - Nguyên Tắc Quản Lý</title>
+    <title>Sơ Đồ 5 Nguyên Tắc Quản Lý (V22 - Nền Sáng)</title>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
     <style>
-        :root {
-            --primary-color: #2c3e50;
-            --accent-color: #c0392b;
+        :root { --primary-color: #2c3e50; }
+        body { 
+            font-family: 'Segoe UI', Roboto, sans-serif; margin: 0; 
+            height: 100vh; width: 100vw; overflow: hidden;
+            background: #0f172a; display: flex; justify-content: center; align-items: center;
         }
-
-        body {
-            font-family: 'Segoe UI', Roboto, sans-serif;
-            margin: 0; padding: 0;
-            overflow: hidden; height: 100vh;
-            display: flex; justify-content: center; align-items: center;
-            background: #1a1a2e; 
+        
+        /* --- [ĐÃ CHỈNH SỬA] BACKGROUND TỔNG THỂ SÁNG HƠN --- */
+        .bg-layer { 
+            position: fixed; width: 100%; height: 100%; top:0; left:0; 
+            background: url('https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?q=80&w=2070') center/cover; 
+            /* Đã tăng độ sáng từ 0.4 lên 0.7 và giảm độ mờ một chút */
+            filter: blur(3px) brightness(0.7); 
+            z-index: -2; 
         }
-
-        /* --- HÌNH NỀN TỔNG THỂ --- */
-        .bg-layer {
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -2;
-            background-image: url('https://images.unsplash.com/photo-1451187580459-43490279c0fa?q=80&w=2072&auto=format&fit=crop');
-            background-size: cover; background-position: center;
-            filter: blur(4px) brightness(0.5);
-            transform: scale(1.05);
+        
+        /* THẺ TÊN */
+        .student-card { 
+            position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%);
+            background: rgba(255,255,255,0.95); padding: 10px 25px; 
+            border-radius: 50px; border-bottom: 4px solid #d35400;
+            z-index: 1000; box-shadow: 0 10px 30px rgba(0,0,0,0.5); 
+            display: flex; gap: 15px; align-items: center;
         }
+        .student-card h4 { margin: 0; font-size: 1rem; color: #333; text-transform: uppercase; font-weight: 800; }
+        .student-card p { margin: 0; font-size: 0.85rem; color: #666; border-left: 2px solid #ccc; padding-left: 15px;}
 
-        /* --- THẺ SINH VIÊN --- */
-        .student-card {
-            position: fixed; top: 20px; left: 20px;
-            background: rgba(255, 255, 255, 0.9);
-            backdrop-filter: blur(10px);
-            padding: 8px 15px; border-radius: 30px;
-            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
-            border-left: 4px solid var(--accent-color);
-            z-index: 100; display: flex; align-items: center; gap: 10px;
+        /* CENTER NODE */
+        .center-node { 
+            position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); 
+            width: 180px; height: 180px;
+            background: linear-gradient(135deg, #2c3e50, #000); border-radius: 50%; 
+            display: flex; flex-direction: column; justify-content: center; align-items: center; 
+            color: white; z-index: 10; border: 4px solid rgba(255,255,255,0.8); 
+            box-shadow: 0 0 40px rgba(211, 84, 0, 0.6); text-align: center; 
         }
-        .uni-logo { width: 32px; height: 32px; background: var(--accent-color); color: white; border-radius: 50%; display: flex; justify-content: center; align-items: center; font-weight: bold; font-size: 0.65rem; }
-        .student-info h4 { margin: 0; font-size: 0.85rem; color: #333; text-transform: uppercase;}
-        .student-info p { margin: 0; font-size: 0.7rem; color: #666; font-weight: 600;}
+        .center-node i { font-size: 3rem; margin-bottom: 8px; color: #e67e22; }
+        .center-node h1 { font-size: 1rem; margin: 0; text-transform: uppercase; font-weight: 800; }
 
-        /* --- MINDMAP CONTAINER --- */
-        .mindmap-container {
-            position: relative; width: 100%; height: 100%;
-            max-width: 1600px; max-height: 1000px;
+        /* CONTAINER */
+        .mindmap-container { position: relative; width: 100%; height: 100%; max-width: 1600px; max-height: 900px; }
+        
+        /* NODE STYLE */
+        .node { 
+            position: absolute; width: 360px;
+            background: #fff; 
+            border-radius: 12px; box-shadow: 0 10px 30px rgba(0,0,0,0.5); 
+            z-index: 5; display: flex; flex-direction: column; overflow: hidden; 
+            border-top: 5px solid #ccc; transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
         }
-        svg#connections { position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 0; pointer-events: none; }
-
-        /* --- CENTER NODE --- */
-        .center-node {
-            position: absolute; top: 50%; left: 50%;
-            transform: translate(-50%, -50%);
-            width: 200px; height: 200px;
-            background: linear-gradient(135deg, #2c3e50, #34495e);
-            border-radius: 50%; display: flex; flex-direction: column;
-            justify-content: center; align-items: center;
-            color: white; z-index: 10;
-            border: 4px solid rgba(255,255,255,0.8);
-            box-shadow: 0 0 20px rgba(241, 196, 15, 0.5), 0 10px 30px rgba(0,0,0,0.3);
-            text-align: center; transition: transform 0.3s;
-        }
-        .center-node:hover { transform: translate(-50%, -50%) scale(1.05); }
-        .center-node i { font-size: 3.5rem; margin-bottom: 8px; color: #f1c40f; text-shadow: 0 2px 5px rgba(0,0,0,0.3); }
-        .center-node h1 { font-size: 1.1rem; margin: 0; text-transform: uppercase; font-weight: 800; letter-spacing: 1px;}
-
-        /* --- NODES --- */
-        .node {
-            position: absolute;
-            width: 350px;
-            background: rgba(255, 255, 255, 0.9);
-            backdrop-filter: blur(15px);
-            border-radius: 16px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.2), inset 0 0 0 1px rgba(255,255,255,0.5);
-            z-index: 5;
-            transition: all 0.4s cubic-bezier(0.25, 0.8, 0.25, 1);
-            display: flex; flex-direction: column;
-            border: 2px solid transparent; 
-            overflow: hidden;
-        }
-
-        /* ẢNH NỀN MỜ BÊN TRONG */
+        
+        /* LỚP ẢNH NỀN NODE */
         .node-bg-inner {
             position: absolute; top: 0; left: 0; width: 100%; height: 100%;
             background-size: cover; background-position: center;
-            opacity: 0.08; z-index: 0;
-            transition: all 0.5s ease;
-            filter: grayscale(100%);
+            opacity: 0.5; 
+            z-index: 1; filter: none; transition: all 0.5s ease;
         }
+        .node:hover .node-bg-inner { opacity: 0.7; transform: scale(1.05); }
 
-        .node:hover .node-bg-inner {
-            opacity: 0.2; transform: scale(1.1); filter: grayscale(0%);
-        }
-
-        /* NỘI DUNG */
-        .node-content-wrapper { position: relative; z-index: 1; display: flex; flex-direction: column; }
-
-        .node-header {
-            padding: 12px 15px; display: flex; align-items: center; gap: 12px;
-            border-bottom: 1px solid rgba(0,0,0,0.08); cursor: pointer;
-        }
-        .icon-box {
-            width: 40px; height: 40px; border-radius: 10px;
-            display: flex; justify-content: center; align-items: center;
-            font-size: 1.3rem; color: white; flex-shrink: 0; box-shadow: 0 4px 8px rgba(0,0,0,0.15);
-        }
-        .header-text h3 { margin: 0; font-size: 0.95rem; text-transform: uppercase; font-weight: 700; color: #2c3e50;}
-        .keyword { font-size: 0.75rem; font-style: italic; color: #555; display: block; margin-top: 1px;}
-
-        .node-body {
-            max-height: 0; opacity: 0; overflow: hidden;
-            padding: 0 15px; background: transparent;
-            transition: all 0.4s ease;
-        }
-
-        .node:hover {
-            transform: translateY(-10px) scale(1.02); 
-            z-index: 20;
-            background: rgba(255, 255, 255, 0.98);
-            box-shadow: 0 20px 40px rgba(0,0,0,0.3);
-        }
-        .node:hover .node-body {
-            max-height: 600px; opacity: 1;
-            padding-bottom: 15px; padding-top: 10px;
-            overflow-y: auto;
-        }
-
-        /* STYLES */
-        .section { margin-bottom: 8px; font-size: 0.85rem; line-height: 1.4; border-bottom: 1px dashed rgba(0,0,0,0.1); padding-bottom: 6px;}
-        .section:last-child { border: none; margin-bottom: 0; padding-bottom: 0;}
-        .lbl { font-weight: bold; display: block; margin-bottom: 3px; color: #2c3e50; }
-        .list-item { display: flex; align-items: flex-start; margin-bottom: 2px; color: #333; }
-        .list-item::before { content: "•"; margin-right: 5px; color: #777; }
-        .badge { display: inline-block; padding: 2px 7px; border-radius: 5px; font-size: 0.7rem; font-weight: bold; color: white; margin-right: 5px; margin-bottom: 2px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);}
-        .b-uu { background: linear-gradient(to right, #2ecc71, #27ae60); }
-        .b-nhuoc { background: linear-gradient(to right, #e74c3c, #c0392b); }
-        .b-app { background: linear-gradient(to right, #9b59b6, #8e44ad); }
-
-        /* CẤU HÌNH VỊ TRÍ VÀ ẢNH */
+        /* NỘI DUNG NODE */
+        .node-content-wrapper { position: relative; z-index: 2; } 
         
-        /* 1. PHÁP LUẬT */
-        .pos-1 { top: 10%; right: 14%; border-color: #FF6B6B; }
-        .g1 { background: linear-gradient(135deg, #FF6B6B, #EE5D6C); }
-        .img-1 { background-image: url('https://images.unsplash.com/photo-1589829085413-56de8ae18c73?q=80&w=600&auto=format&fit=crop'); }
+        .node-header { 
+            padding: 15px 15px; display: flex; align-items: center; gap: 15px; 
+            border-bottom: 1px solid rgba(0,0,0,0.1); 
+            background: transparent; cursor: pointer;
+        }
+        
+        .icon-box { 
+            width: 45px; height: 45px; border-radius: 10px; display: flex; 
+            justify-content: center; align-items: center; font-size: 1.4rem; color: white; 
+            flex-shrink: 0; box-shadow: 0 4px 8px rgba(0,0,0,0.3);
+        }
+        .header-text h3 { 
+            margin: 0; font-size: 0.95rem; text-transform: uppercase; font-weight: 900; 
+            color: #222; line-height: 1.3;
+            text-shadow: 0 0 10px rgba(255,255,255,1), 0 0 20px rgba(255,255,255,0.8);
+        }
+        
+        .node-body { 
+            max-height: 0; opacity: 0; overflow: hidden; padding: 0 15px; 
+            transition: all 0.3s ease; 
+            background: rgba(255,255,255,0.5); 
+        }
+        
+        .node:hover { transform: translateY(-10px); z-index: 50; }
+        .node:hover .node-body { 
+            max-height: 550px; opacity: 1; 
+            padding-bottom: 20px; padding-top: 10px; overflow-y: auto; 
+        }
 
-        /* 2. DÂN CHỦ */
-        .pos-2 { top: 45%; right: 4%; transform: translateY(-50%); border-color: #4facfe; } 
-        .pos-2:hover { transform: translateY(-60%) scale(1.02); }
-        .g2 { background: linear-gradient(135deg, #4facfe, #00f2fe); }
-        .img-2 { background-image: url('https://images.unsplash.com/photo-1556761175-5973dc0f32e7?q=80&w=600&auto=format&fit=crop'); }
+        /* LIST ITEMS */
+        .sec-title { 
+            display: block; font-weight: bold; font-size: 0.75rem; margin: 12px 0 6px 0; 
+            padding: 4px 8px; border-radius: 4px; color: #fff; width: fit-content; 
+            text-transform: uppercase; letter-spacing: 0.5px; 
+            box-shadow: 0 2px 5px rgba(0,0,0,0.3); text-shadow: none;
+        }
+        .t-dacdiem { background: #34495e; } 
+        .t-uu { background: #27ae60; }     
+        .t-nhuoc { background: #c0392b; }  
+        .t-ungdung { background: #8e44ad; } 
+        
+        .list-item { 
+            display: flex; align-items: flex-start; margin-bottom: 5px; 
+            font-size: 0.85rem; color: #000; font-weight: 700; 
+            line-height: 1.5; border-bottom: 1px dashed rgba(0,0,0,0.3); padding-bottom: 5px;
+            text-shadow: 0 0 5px rgba(255,255,255,0.9); 
+        }
+        .list-item i { margin-right: 10px; margin-top: 4px; font-size: 0.8rem; flex-shrink: 0;}
 
-        /* 3. LỢI ÍCH */
-        .pos-3 { bottom: 10%; right: 14%; border-color: #f5576c; }
-        .g3 { background: linear-gradient(135deg, #f093fb, #f5576c); }
-        .img-3 { background-image: url('https://images.unsplash.com/photo-1554224155-8d04cb21cd6c?q=80&w=600&auto=format&fit=crop'); }
+        /* --- VỊ TRÍ & ẢNH NỀN NODE --- */
+        .pos-1 { top: 8%; right: 8%; border-color: #c0392b; }
+        .g1 { background: linear-gradient(135deg, #c0392b, #e74c3c); }
+        .img-1 { background-image: url('https://images.unsplash.com/photo-1577495508048-b635879837f1?q=80&w=800&auto=format&fit=crop'); }
 
-        /* 4. HIỆU QUẢ */
-        .pos-4 { bottom: 10%; left: 14%; border-color: #43e97b; }
-        .g4 { background: linear-gradient(135deg, #43e97b, #38f9d7); }
-        .img-4 { background-image: url('https://images.unsplash.com/photo-1460925895917-afdab827c52f?q=80&w=600&auto=format&fit=crop'); }
+        .pos-2 { top: 50%; right: 2%; transform: translateY(-50%); border-color: #2980b9; }
+        .pos-2:hover { transform: translateY(-55%); }
+        .g2 { background: linear-gradient(135deg, #2980b9, #3498db); }
+        .img-2 { background-image: url('https://images.unsplash.com/photo-1517048676732-d65bc937f952?q=80&w=800&auto=format&fit=crop'); }
 
-        /* 5. CHUYÊN MÔN */
-        .pos-5 { top: 10%; left: 14%; border-color: #fa709a; }
-        .g5 { background: linear-gradient(135deg, #fa709a, #fee140); }
-        .img-5 { background-image: url('https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?q=80&w=600&auto=format&fit=crop'); }
+        .pos-3 { bottom: 8%; right: 8%; border-color: #f39c12; }
+        .g3 { background: linear-gradient(135deg, #f39c12, #f1c40f); }
+        .img-3 { background-image: url('https://images.unsplash.com/photo-1521791136064-7986c2920216?q=80&w=800&auto=format&fit=crop'); }
 
+        .pos-4 { bottom: 8%; left: 8%; border-color: #27ae60; }
+        .g4 { background: linear-gradient(135deg, #27ae60, #2ecc71); }
+        .img-4 { background-image: url('https://images.unsplash.com/photo-1590283603385-17ffb3a7f29f?q=80&w=800&auto=format&fit=crop'); }
+
+        .pos-5 { top: 8%; left: 8%; border-color: #8e44ad; }
+        .g5 { background: linear-gradient(135deg, #8e44ad, #9b59b6); }
+        .img-5 { background-image: url('https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?q=80&w=800&auto=format&fit=crop'); }
+
+        svg#connections { position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 0; pointer-events: none; }
+        
         @media (max-width: 1100px) {
-            body { overflow: auto; height: auto; display: block; padding: 20px; }
-            .student-card { position: relative; top: auto; left: auto; margin-bottom: 20px; width: fit-content; background: white;}
-            .mindmap-container { height: auto; display: flex; flex-direction: column; align-items: center; gap: 20px;}
+            body { overflow: auto; height: auto; display: block; padding: 40px 15px; }
+            .student-card { position: relative; bottom: auto; left: auto; transform: none; margin: 0 auto 30px auto; width: fit-content; border-bottom: none; border-left: 4px solid #d35400;}
+            .mindmap-container { height: auto; display: flex; flex-direction: column; align-items: center; gap: 15px;}
             svg#connections { display: none; }
-            .center-node { position: relative; top: auto; left: auto; transform: none; margin-bottom: 30px; }
-            .node { position: relative; top: auto !important; left: auto !important; width: 100%; transform: none !important; background: white; margin-bottom: 15px;}
+            .center-node { position: relative; top: auto; left: auto; transform: none; margin-bottom: 25px; }
+            .node { position: relative; top: auto !important; left: auto !important; width: 100%; transform: none !important; margin-bottom: 10px;}
             .node .node-body { max-height: none; opacity: 1; padding: 15px; }
             .node:hover { transform: none; }
         }
@@ -182,53 +158,37 @@
 
 <div class="bg-layer"></div>
 
-<div class="student-card">
-    <div class="uni-logo">HUC</div>
-    <div class="student-info">
-        <h4>NHÓM 1/N01-KHQL</h4>
-        <p>QTTT - ĐH Văn hóa Hà Nội</p>
-    </div>
-</div>
-
 <div class="mindmap-container">
     <svg id="connections"></svg>
 
     <div class="center-node" id="center">
-        <i class="fa-solid fa-scale-balanced"></i>
-        <h1>NGUYÊN TẮC<br>QUẢN LÝ</h1>
+        <i class="fa-solid fa-landmark"></i>
+        <h1>5 NGUYÊN TẮC<br>QUẢN LÝ</h1>
     </div>
 
     <div class="node pos-1" id="n1">
         <div class="node-bg-inner img-1"></div>
         <div class="node-content-wrapper">
             <div class="node-header">
-                <div class="icon-box g1"><i class="fa-solid fa-gavel"></i></div>
-                <div class="header-text">
-                    <h3>Tuân Thủ Pháp Luật</h3>
-                    <span class="keyword">Kỷ cương - Văn hóa</span>
-                </div>
+                <div class="icon-box g1"><i class="fa-solid fa-flag"></i></div>
+                <div class="header-text"><h3>Thống Nhất Lãnh Đạo<br>Chính Trị & Kinh Tế</h3></div>
             </div>
             <div class="node-body">
-                <div class="section">
-                    <span class="lbl">🔹 Đặc điểm:</span>
-                    <div class="list-item">Khuôn khổ pháp luật Nhà nước.</div>
-                    <div class="list-item">Tôn trọng phong tục, đạo đức.</div>
-                </div>
-                <div class="section">
-                    <span class="badge b-uu">👍 Ưu điểm</span>
-                    <div class="list-item">Đảm bảo tính chính danh & bền vững.</div>
-                    <div class="list-item">Tránh rủi ro pháp lý & khủng hoảng.</div>
-                </div>
-                <div class="section">
-                    <span class="badge b-nhuoc">👎 Nhược điểm</span>
-                    <div class="list-item">Thủ tục rườm rà → Chậm tiến độ.</div>
-                    <div class="list-item">Xung đột văn hóa/luật pháp (đa quốc gia).</div>
-                </div>
-                <div class="section">
-                    <span class="badge b-app">🚀 Ứng dụng thực tiễn</span>
-                    <div class="list-item">Đóng thuế đủ, tuân thủ Luật (Lao động/Môi trường).</div>
-                    <div class="list-item">Trách nhiệm xã hội (CSR), từ thiện.</div>
-                </div>
+                <span class="sec-title t-dacdiem">Đặc điểm</span>
+                <div class="list-item"><i class="fa-solid fa-circle"></i> Chính trị là biểu hiện tập trung của kinh tế.</div>
+                <div class="list-item"><i class="fa-solid fa-circle"></i> Kinh tế quyết định chính trị.</div>
+                
+                <span class="sec-title t-uu">Ưu điểm</span>
+                <div class="list-item"><i class="fa-solid fa-check"></i> Đảm bảo nền kinh tế phát triển đúng định hướng XHCN.</div>
+                <div class="list-item"><i class="fa-solid fa-check"></i> Tạo môi trường chính trị ổn định để phát triển.</div>
+                
+                <span class="sec-title t-nhuoc">Nhược điểm (Rủi ro)</span>
+                <div class="list-item"><i class="fa-solid fa-xmark"></i> Bệnh "duy ý chí" (áp đặt chính trị chủ quan).</div>
+                <div class="list-item"><i class="fa-solid fa-xmark"></i> Buông lỏng lãnh đạo gây chệch hướng phát triển.</div>
+
+                <span class="sec-title t-ungdung">Ứng dụng thực tiễn</span>
+                <div class="list-item"><i class="fa-solid fa-rocket"></i> Chiến lược KT-XH 10 năm của Đảng.</div>
+                <div class="list-item"><i class="fa-solid fa-rocket"></i> Kinh tế Nhà nước giữ vai trò chủ đạo.</div>
             </div>
         </div>
     </div>
@@ -237,33 +197,25 @@
         <div class="node-bg-inner img-2"></div>
         <div class="node-content-wrapper">
             <div class="node-header">
-                <div class="icon-box g2"><i class="fa-solid fa-users"></i></div>
-                <div class="header-text">
-                    <h3>Tập Trung Dân Chủ</h3>
-                    <span class="keyword">Thống nhất - Lắng nghe</span>
-                </div>
+                <div class="icon-box g2"><i class="fa-solid fa-users-rays"></i></div>
+                <div class="header-text"><h3>Tập Trung Dân Chủ</h3></div>
             </div>
             <div class="node-body">
-                <div class="section">
-                    <span class="lbl">🔹 Đặc điểm:</span>
-                    <div class="list-item">Tập trung: Lãnh đạo quyết định cuối cùng.</div>
-                    <div class="list-item">Dân chủ: Nhân viên góp ý trước.</div>
-                </div>
-                <div class="section">
-                    <span class="badge b-uu">👍 Ưu điểm</span>
-                    <div class="list-item">Khai thác trí tuệ tập thể.</div>
-                    <div class="list-item">Quyết định sáng suốt + Kỷ luật cao.</div>
-                </div>
-                <div class="section">
-                    <span class="badge b-nhuoc">👎 Nhược điểm</span>
-                    <div class="list-item">Tốn thời gian họp hành.</div>
-                    <div class="list-item">Biến tướng: "Dân chủ hình thức" hoặc "Độc đoán".</div>
-                </div>
-                <div class="section">
-                    <span class="badge b-app">🚀 Ứng dụng thực tiễn</span>
-                    <div class="list-item">Họp lấy ý kiến trước chính sách mới.</div>
-                    <div class="list-item">Hòm thư góp ý, bỏ phiếu kín.</div>
-                </div>
+                <span class="sec-title t-dacdiem">Đặc điểm</span>
+                <div class="list-item"><i class="fa-solid fa-circle"></i> Dân chủ bàn bạc - Tập trung quyết định.</div>
+                <div class="list-item"><i class="fa-solid fa-circle"></i> Cấp dưới phục tùng cấp trên.</div>
+                
+                <span class="sec-title t-uu">Ưu điểm</span>
+                <div class="list-item"><i class="fa-solid fa-check"></i> Đảm bảo kỷ cương, sức mạnh thống nhất.</div>
+                <div class="list-item"><i class="fa-solid fa-check"></i> Khơi dậy trí tuệ tập thể, tránh độc đoán.</div>
+
+                <span class="sec-title t-nhuoc">Nhược điểm (Rủi ro)</span>
+                <div class="list-item"><i class="fa-solid fa-xmark"></i> Quan liêu, cửa quyền (Quá tập trung).</div>
+                <div class="list-item"><i class="fa-solid fa-xmark"></i> Vô chính phủ, phân tán (Quá dân chủ).</div>
+
+                <span class="sec-title t-ungdung">Ứng dụng thực tiễn</span>
+                <div class="list-item"><i class="fa-solid fa-rocket"></i> Lấy ý kiến nhân dân khi làm Luật.</div>
+                <div class="list-item"><i class="fa-solid fa-rocket"></i> Họp giao ban, hội nghị cán bộ.</div>
             </div>
         </div>
     </div>
@@ -272,33 +224,25 @@
         <div class="node-bg-inner img-3"></div>
         <div class="node-content-wrapper">
             <div class="node-header">
-                <div class="icon-box g3"><i class="fa-solid fa-hand-holding-dollar"></i></div>
-                <div class="header-text">
-                    <h3>Hài Hòa Lợi Ích</h3>
-                    <span class="keyword">Động lực - Công bằng</span>
-                </div>
+                <div class="icon-box g3"><i class="fa-solid fa-scale-balanced"></i></div>
+                <div class="header-text"><h3>Kết Hợp Hài Hòa<br>Các Lợi Ích</h3></div>
             </div>
             <div class="node-body">
-                <div class="section">
-                    <span class="lbl">🔹 Đặc điểm:</span>
-                    <div class="list-item">Cân bằng 4 bên: Chủ - Thợ - Khách - Xã hội.</div>
-                    <div class="list-item">Lợi ích kinh tế làm động lực chính.</div>
-                </div>
-                <div class="section">
-                    <span class="badge b-uu">👍 Ưu điểm</span>
-                    <div class="list-item">Tạo động lực mạnh mẽ.</div>
-                    <div class="list-item">Giảm mâu thuẫn nội bộ.</div>
-                </div>
-                <div class="section">
-                    <span class="badge b-nhuoc">👎 Nhược điểm</span>
-                    <div class="list-item">Khó làm hài lòng tất cả (Bài toán chia bánh).</div>
-                    <div class="list-item">Dễ gây so bì nếu thiếu minh bạch.</div>
-                </div>
-                <div class="section">
-                    <span class="badge b-app">🚀 Ứng dụng thực tiễn</span>
-                    <div class="list-item">Lương thưởng KPI, ESOP (chia lợi nhuận).</div>
-                    <div class="list-item">Phúc lợi (bảo hiểm, du lịch).</div>
-                </div>
+                <span class="sec-title t-dacdiem">Đặc điểm</span>
+                <div class="list-item"><i class="fa-solid fa-circle"></i> 3 lợi ích: Xã hội - Tập thể - Cá nhân.</div>
+                <div class="list-item"><i class="fa-solid fa-circle"></i> Lợi ích kinh tế là động lực trực tiếp.</div>
+                
+                <span class="sec-title t-uu">Ưu điểm</span>
+                <div class="list-item"><i class="fa-solid fa-check"></i> Tạo động lực lao động mạnh mẽ.</div>
+                <div class="list-item"><i class="fa-solid fa-check"></i> Giải quyết mâu thuẫn xã hội.</div>
+
+                <span class="sec-title t-nhuoc">Nhược điểm (Rủi ro)</span>
+                <div class="list-item"><i class="fa-solid fa-xmark"></i> Khó định lượng mức độ "hài hòa".</div>
+                <div class="list-item"><i class="fa-solid fa-xmark"></i> Chênh lệch thu nhập gây đố kỵ.</div>
+
+                <span class="sec-title t-ungdung">Ứng dụng thực tiễn</span>
+                <div class="list-item"><i class="fa-solid fa-rocket"></i> Lương cứng + Thưởng năng suất (KPI).</div>
+                <div class="list-item"><i class="fa-solid fa-rocket"></i> Cổ phần hóa doanh nghiệp.</div>
             </div>
         </div>
     </div>
@@ -308,32 +252,24 @@
         <div class="node-content-wrapper">
             <div class="node-header">
                 <div class="icon-box g4"><i class="fa-solid fa-chart-line"></i></div>
-                <div class="header-text">
-                    <h3>Tiết Kiệm & Hiệu Quả</h3>
-                    <span class="keyword">Tối ưu - Năng suất</span>
-                </div>
+                <div class="header-text"><h3>Tiết Kiệm & Hiệu Quả<br>Kinh Tế Cao Nhất</h3></div>
             </div>
             <div class="node-body">
-                <div class="section">
-                    <span class="lbl">🔹 Đặc điểm:</span>
-                    <div class="list-item">Kết quả cao nhất / Chi phí thấp nhất.</div>
-                    <div class="list-item">Tiết kiệm = Tránh lãng phí (≠ bủn xỉn).</div>
-                </div>
-                <div class="section">
-                    <span class="badge b-uu">👍 Ưu điểm</span>
-                    <div class="list-item">Tối đa hóa lợi nhuận.</div>
-                    <div class="list-item">Sử dụng nguồn lực thông minh.</div>
-                </div>
-                <div class="section">
-                    <span class="badge b-nhuoc">👎 Nhược điểm</span>
-                    <div class="list-item">Tiết kiệm quá → Ảnh hưởng chất lượng.</div>
-                    <div class="list-item">Áp lực căng thẳng (khi cắt giảm biên chế).</div>
-                </div>
-                <div class="section">
-                    <span class="badge b-app">🚀 Ứng dụng thực tiễn</span>
-                    <div class="list-item">Công nghệ mới → Giảm nhân công.</div>
-                    <div class="list-item">Quy trình tinh gọn (Lean), tiết kiệm điện/giấy.</div>
-                </div>
+                <span class="sec-title t-dacdiem">Đặc điểm</span>
+                <div class="list-item"><i class="fa-solid fa-circle"></i> Hiệu quả = Kết quả đầu ra / Chi phí đầu vào.</div>
+                <div class="list-item"><i class="fa-solid fa-circle"></i> Tiết kiệm nguồn lực (Nhân/Tài/Vật).</div>
+                
+                <span class="sec-title t-uu">Ưu điểm</span>
+                <div class="list-item"><i class="fa-solid fa-check"></i> Tối ưu hóa nguồn lực khan hiếm.</div>
+                <div class="list-item"><i class="fa-solid fa-check"></i> Nâng cao năng lực cạnh tranh.</div>
+
+                <span class="sec-title t-nhuoc">Nhược điểm (Rủi ro)</span>
+                <div class="list-item"><i class="fa-solid fa-xmark"></i> Tiết kiệm bủn xỉn làm giảm chất lượng.</div>
+                <div class="list-item"><i class="fa-solid fa-xmark"></i> Hủy hoại môi trường vì lợi nhuận.</div>
+
+                <span class="sec-title t-ungdung">Ứng dụng thực tiễn</span>
+                <div class="list-item"><i class="fa-solid fa-rocket"></i> Tinh giản biên chế bộ máy.</div>
+                <div class="list-item"><i class="fa-solid fa-rocket"></i> Chính phủ điện tử, Chuyển đổi số.</div>
             </div>
         </div>
     </div>
@@ -342,37 +278,33 @@
         <div class="node-bg-inner img-5"></div>
         <div class="node-content-wrapper">
             <div class="node-header">
-                <div class="icon-box g5"><i class="fa-solid fa-server"></i></div>
-                <div class="header-text">
-                    <h3>Chuyên Môn Hóa</h3>
-                    <span class="keyword">Chuyên nghiệp - Bài bản</span>
-                </div>
+                <div class="icon-box g5"><i class="fa-solid fa-map-location-dot"></i></div>
+                <div class="header-text"><h3>Kết Hợp Quản Lý<br>Ngành & Lãnh Thổ</h3></div>
             </div>
             <div class="node-body">
-                <div class="section">
-                    <span class="lbl">🔹 Đặc điểm:</span>
-                    <div class="list-item">Đúng người đúng việc (theo sở trường).</div>
-                    <div class="list-item">Chỉ tập trung làm tốt một khâu.</div>
-                </div>
-                <div class="section">
-                    <span class="badge b-uu">👍 Ưu điểm</span>
-                    <div class="list-item">Năng suất vọt, kỹ năng tinh thông.</div>
-                    <div class="list-item">Dễ đào tạo & kiểm soát chất lượng.</div>
-                </div>
-                <div class="section">
-                    <span class="badge b-nhuoc">👎 Nhược điểm</span>
-                    <div class="list-item">Đơn điệu, nhàm chán (Kiểu Taylor).</div>
-                    <div class="list-item">Thiếu cái nhìn tổng thể.</div>
-                </div>
-                <div class="section">
-                    <span class="badge b-app">🚀 Ứng dụng thực tiễn</span>
-                    <div class="list-item">Dây chuyền lắp ráp.</div>
-                    <div class="list-item">Chia phòng ban chuyên biệt (MKT, HR, Kế toán...).</div>
-                </div>
+                <span class="sec-title t-dacdiem">Đặc điểm</span>
+                <div class="list-item"><i class="fa-solid fa-circle"></i> Dọc (Ngành): Kỹ thuật, quy trình.</div>
+                <div class="list-item"><i class="fa-solid fa-circle"></i> Ngang (Lãnh thổ): Dân cư, tài nguyên.</div>
+                
+                <span class="sec-title t-uu">Ưu điểm</span>
+                <div class="list-item"><i class="fa-solid fa-check"></i> Chuyên sâu kỹ thuật + Sát thực tế địa phương.</div>
+                <div class="list-item"><i class="fa-solid fa-check"></i> Khai thác tối đa thế mạnh tại chỗ.</div>
+
+                <span class="sec-title t-nhuoc">Nhược điểm (Rủi ro)</span>
+                <div class="list-item"><i class="fa-solid fa-xmark"></i> Chồng chéo chỉ đạo "song trùng trực thuộc".</div>
+                <div class="list-item"><i class="fa-solid fa-xmark"></i> Cục bộ bản vị hoặc cục bộ địa phương.</div>
+
+                <span class="sec-title t-ungdung">Ứng dụng thực tiễn</span>
+                <div class="list-item"><i class="fa-solid fa-rocket"></i> Sở chuyên môn thuộc UBND Tỉnh.</div>
+                <div class="list-item"><i class="fa-solid fa-rocket"></i> Quy hoạch khu CN tại địa phương.</div>
             </div>
         </div>
     </div>
+</div>
 
+<div class="student-card">
+    <h4>NHÓM 1/N01-KHQL</h4>
+    <p>QTTT - ĐH Văn hóa Hà Nội</p>
 </div>
 
 <script>
@@ -385,8 +317,8 @@
         document.querySelectorAll('.node').forEach(node => {
             const nRect = node.getBoundingClientRect();
             let nX, nY;
-            if (nRect.left > cRect.right) { nX = nRect.left + 20; nY = nRect.top + 30; } 
-            else if (nRect.right < cRect.left) { nX = nRect.right - 20; nY = nRect.top + 30; } 
+            if (nRect.left > cRect.right) { nX = nRect.left + 20; nY = nRect.top + 25; } 
+            else if (nRect.right < cRect.left) { nX = nRect.right - 20; nY = nRect.top + 25; } 
             else { nX = nRect.left + nRect.width/2; nY = (nRect.top > cY) ? nRect.top : nRect.bottom; }
 
             const style = window.getComputedStyle(node);
@@ -394,25 +326,16 @@
 
             const line = document.createElementNS('http://www.w3.org/2000/svg', 'path');
             const d = `M ${cX} ${cY} Q ${cX} ${nY} ${nX} ${nY}`;
-            
-            line.setAttribute('d', d);
-            line.setAttribute('stroke', color);
-            line.setAttribute('stroke-width', '2');
-            line.setAttribute('fill', 'none');
-            line.setAttribute('stroke-dasharray', '4,4');
-            line.setAttribute('filter', 'drop-shadow(0 0 5px ' + color + ')');
-            line.setAttribute('opacity', '0.8');
-
+            line.setAttribute('d', d); line.setAttribute('stroke', color); line.setAttribute('stroke-width', '2');
+            line.setAttribute('fill', 'none'); line.setAttribute('stroke-dasharray', '5,5');
             svg.appendChild(line);
         });
     }
-    window.addEventListener('load', drawLines);
-    window.addEventListener('resize', drawLines);
+    window.addEventListener('load', drawLines); window.addEventListener('resize', drawLines);
     document.querySelectorAll('.node').forEach(node => {
         node.addEventListener('mouseenter', () => setTimeout(drawLines, 50));
-        node.addEventListener('mouseleave', () => setTimeout(drawLines, 400));
+        node.addEventListener('mouseleave', () => setTimeout(drawLines, 350));
     });
 </script>
-
 </body>
 </html>
